@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Galeri Indah</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: #151515;
+      color: #e8e8e8;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    /* Halaman normal */
+    .home {
+      width: 100%;
+      height: 100vh;
+      min-height: 500px;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      text-align: center;
+      background:
+        radial-gradient(circle at center, #252525 0%, #171717 45%, #0c0c0c 100%);
+
+      transition: opacity 0.1s ease;
+    }
+
+    .home h1 {
+      font-size: clamp(1.8rem, 5vw, 3.5rem);
+      font-weight: 400;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .home p {
+      color: #999;
+      font-size: clamp(0.9rem, 2vw, 1.1rem);
+      margin-bottom: 35px;
+    }
+
+    #surpriseButton {
+      border: 1px solid #555;
+      background: #252525;
+      color: #eee;
+
+      padding: 15px 30px;
+      border-radius: 6px;
+
+      font-size: 1rem;
+      cursor: pointer;
+
+      transition:
+        background 0.2s,
+        transform 0.2s,
+        border-color 0.2s;
+    }
+
+    #surpriseButton:hover {
+      background: #333;
+      border-color: #777;
+      transform: translateY(-2px);
+    }
+
+    #surpriseButton:active {
+      transform: scale(0.97);
+    }
+
+    /* Layar jumpscare */
+    .jumpscare {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+
+      display: none;
+      justify-content: center;
+      align-items: center;
+
+      background: #000;
+      overflow: hidden;
+    }
+
+    .jumpscare.active {
+      display: flex;
+      animation: screenShake 0.45s linear;
+    }
+
+    .monster {
+      width: 100vw;
+      height: 100vh;
+
+      object-fit: cover;
+
+      animation:
+        monsterAppear 0.1s linear,
+        monsterZoom 0.45s ease-out;
+    }
+
+    /* Flash putih/merah singkat */
+    .flash {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+
+      background: white;
+      pointer-events: none;
+
+      animation: flashEffect 0.12s linear forwards;
+    }
+
+    @keyframes monsterAppear {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes monsterZoom {
+      from {
+        transform: scale(1.8);
+      }
+
+      to {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes flashEffect {
+      0% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes screenShake {
+      0%   { transform: translate(0, 0) rotate(0); }
+      10%  { transform: translate(-12px, 8px) rotate(-1deg); }
+      20%  { transform: translate(12px, -8px) rotate(1deg); }
+      30%  { transform: translate(-10px, -10px) rotate(0deg); }
+      40%  { transform: translate(10px, 10px) rotate(1deg); }
+      50%  { transform: translate(-8px, 5px) rotate(-1deg); }
+      60%  { transform: translate(8px, -5px) rotate(0); }
+      70%  { transform: translate(-5px, 5px) rotate(-1deg); }
+      80%  { transform: translate(5px, -5px) rotate(1deg); }
+      90%  { transform: translate(-3px, 3px); }
+      100% { transform: translate(0, 0) rotate(0); }
+    }
+
+    /* Teks kecil di layar jumpscare */
+    .scare-text {
+      position: absolute;
+      z-index: 4;
+      bottom: 25px;
+      left: 0;
+      width: 100%;
+
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+
+      font-size: 11px;
+      letter-spacing: 4px;
+
+      pointer-events: none;
+    }
+
+    @media (max-width: 600px) {
+      .home {
+        padding: 20px;
+      }
+
+      .home h1 {
+        font-size: 2rem;
+      }
+
+      #surpriseButton {
+        width: min(80%, 280px);
+        padding: 16px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Halaman normal -->
+  <main class="home" id="home">
+    <h1>Selamat Datang di Galeri Indah</h1>
+
+    <p>
+      Nikmati koleksi sederhana kami.
+    </p>
+
+    <button id="surpriseButton">
+      Buka Kejutan
+    </button>
+  </main>
+
+
+  <!-- Layar jumpscare -->
+  <section class="jumpscare" id="jumpscare">
+
+    <div class="flash"></div>
+
+    <!--
+      SVG inline sebagai gambar monster.
+      Tidak membutuhkan file gambar eksternal.
+    -->
+    <svg
+      class="monster"
+      viewBox="0 0 800 800"
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="xMidYMid slice"
+      aria-label="Wajah monster"
+    >
+      <defs>
+        <radialGradient id="bg" cx="50%" cy="45%" r="70%">
+          <stop offset="0%" stop-color="#333"/>
+          <stop offset="55%" stop-color="#090909"/>
+          <stop offset="100%" stop-color="#000"/>
+        </radialGradient>
+
+        <radialGradient id="skin" cx="50%" cy="35%" r="65%">
+          <stop offset="0%" stop-color="#a7a7a7"/>
+          <stop offset="55%" stop-color="#4d4d4d"/>
+          <stop offset="100%" stop-color="#111"/>
+        </radialGradient>
+
+        <radialGradient id="eye">
+          <stop offset="0%" stop-color="#fff"/>
+          <stop offset="35%" stop-color="#ff3333"/>
+          <stop offset="100%" stop-color="#300"/>
+        </radialGradient>
+
+        <filter id="blur">
+          <feGaussianBlur stdDeviation="5"/>
+        </filter>
+
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="8"/>
+        </filter>
+      </defs>
+
+      <!-- background -->
+      <rect width="800" height="800" fill="url(#bg)"/>
+
+      <!-- bayangan kepala -->
+      <ellipse
+        cx="400"
+        cy="420"
+        rx="300"
+        ry="365"
+        fill="#000"
+        filter="url(#blur)"
+      />
+
+      <!-- kepala -->
+      <path
+        d="
+          M400 70
+          C230 70 135 210 145 405
+          C155 615 250 750 400 760
+          C550 750 645 615 655 405
+          C665 210 570 70 400 70
+          Z
+        "
+        fill="url(#skin)"
+      />
+
+      <!-- dahi gelap -->
+      <path
+        d="
+          M190 260
+          C235 115 565 115 610 260
+          C540 215 260 215 190 260
+          Z
+        "
+        fill="#181818"
+      />
+
+      <!-- mata kiri -->
+      <ellipse
+        cx="285"
+        cy="350"
+        rx="75"
+        ry="58"
+        fill="#050505"
+      />
+
+      <ellipse
+        cx="285"
+        cy="350"
+        rx="38"
+        ry="43"
+        fill="url(#eye)"
+        filter="url(#glow)"
+      />
+
+      <ellipse
+        cx="285"
+        cy="350"
+        rx="12"
+        ry="30"
+        fill="#000"
+      />
+
+      <!-- mata kanan -->
+      <ellipse
+        cx="515"
+        cy="350"
+        rx="75"
+        ry="58"
+        fill="#050505"
+      />
+
+      <ellipse
+        cx="515"
+        cy="350"
+        rx="38"
+        ry="43"
+        fill="url(#eye)"
+        filter="url(#glow)"
+      />
+
+      <ellipse
+        cx="515"
+        cy="350"
+        rx="12"
+        ry="30"
+        fill="#000"
+      />
+
+      <!-- hidung -->
+      <path
+        d="
+          M400 350
+          C370 425 355 465 365 485
+          C380 500 420 500 435 485
+          C445 465 430 425 400 350
+        "
+        fill="#222"
+      />
+
+      <!-- mulut hitam -->
+      <path
+        d="
+          M235 510
+          C300 550 500 550 565 510
+          C550 625 480 685 400 690
+          C320 685 250 625 235 510
+          Z
+        "
+        fill="#030303"
+      />
+
+      <!-- gigi -->
+      <g fill="#e8e8e8">
+        <path d="M265 535 L290 550 L275 600 Z"/>
+        <path d="M310 550 L335 560 L320 620 Z"/>
+        <path d="M355 555 L375 560 L365 630 Z"/>
+        <path d="M400 560 L420 560 L410 635 Z"/>
+        <path d="M445 555 L465 550 L475 625 Z"/>
+        <path d="M490 550 L515 535 L525 600 Z"/>
+      </g>
+
+      <!-- retakan wajah -->
+      <g
+        stroke="#111"
+        stroke-width="7"
+        fill="none"
+        opacity="0.8"
+      >
+        <path d="M205 270 L175 210 L200 160"/>
+        <path d="M595 270 L625 210 L600 160"/>
+        <path d="M220 430 L180 450 L165 500"/>
+        <path d="M580 430 L620 450 L635 500"/>
+      </g>
+
+      <!-- vignette -->
+      <rect
+        width="800"
+        height="800"
+        fill="none"
+        stroke="#000"
+        stroke-width="120"
+        opacity="0.7"
+      />
+    </svg>
+
+    <div class="scare-text">
+      YOU SHOULDN'T HAVE OPENED THIS
+    </div>
+  </section>
+
+
+  <!--
+    Audio.
+    Ganti URL di bawah dengan file suara milik Anda sendiri
+    jika URL publik tersebut sudah tidak tersedia.
+  -->
+  <audio
+    id="scareAudio"
+    preload="auto"
+  >
+    <source
+      src="https://www.myinstants.com/media/sounds/jumpscare-sound.mp3"
+      type="audio/mpeg"
+    />
+  </audio>
+
+
+  <script>
+    const button = document.getElementById("surpriseButton");
+    const home = document.getElementById("home");
+    const jumpscare = document.getElementById("jumpscare");
+    const audio = document.getElementById("scareAudio");
+
+    let triggered = false;
+
+    button.addEventListener("click", () => {
+
+      // Mencegah tombol dipencet berkali-kali
+      if (triggered) return;
+      triggered = true;
+
+      /*
+       * Audio dipanggil langsung dari event klik.
+       * Ini penting karena browser biasanya memblokir
+       * autoplay audio yang tidak berasal dari interaksi pengguna.
+       */
+      audio.currentTime = 0;
+
+      const playPromise = audio.play();
+
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          console.log("Audio diblokir oleh browser.");
+        });
+      }
+
+      // Hilangkan halaman normal dengan cepat
+      home.style.opacity = "0";
+
+      // Tampilkan jumpscare
+      jumpscare.classList.add("active");
+
+      // Hapus halaman normal dari tampilan setelah 100ms
+      setTimeout(() => {
+        home.style.display = "none";
+      }, 100);
+
+    });
+
+
+    /*
+     * Jika pengguna menekan Escape setelah jumpscare,
+     * halaman bisa dikembalikan.
+     */
+    document.addEventListener("keydown", (event) => {
+
+      if (event.key === "Escape" && triggered) {
+
+        audio.pause();
+        audio.currentTime = 0;
+
+        jumpscare.classList.remove("active");
+
+        home.style.display = "flex";
+
+        // Memaksa browser melakukan repaint sebelum opacity
+        requestAnimationFrame(() => {
+          home.style.opacity = "1";
+        });
+
+        triggered = false;
+      }
+
+    });
+  </script>
+
+</body>
+</html>
